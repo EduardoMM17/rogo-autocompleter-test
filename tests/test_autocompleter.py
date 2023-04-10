@@ -2,10 +2,15 @@ import pytest
 
 from engine.term_index import TermIndex, Term
 from engine.autocompleter import Autocompleter
+from engine.utils import Utils
 
 @pytest.fixture
 def term_index():
     return TermIndex()
+
+@pytest.fixture
+def utils():
+    return Utils()   
 
 
 @pytest.mark.parametrize(
@@ -45,9 +50,22 @@ def term_index():
         ]),
     ],
 )
-def test_answer(term_index: TermIndex, string: str, suggestions: list[list[str]]):
-    autocompleter = Autocompleter(term_index=term_index)
+def test_answer(term_index: TermIndex, utils: Utils, string: str, suggestions: list[list[str]]):
+    autocompleter = Autocompleter(term_index=term_index, utils=utils)
 
     response = autocompleter.suggestions(string)
 
     assert { tuple(x) for x in response } == { tuple([Term(value=s) for s in xs]) for xs in suggestions}
+
+  
+# @pytest.mark.parametrize(
+#     "string, g_list",
+#     [
+#         ("", []),
+#         ("ma", [Term(value="maximum"), Term(value="march")])
+#     ]
+# )
+# def test_term_index(string: str, g_list : list[str]):
+#     term_index = TermIndex()
+#     response = term_index.search(string)
+#     assert response ==  g_list
